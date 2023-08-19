@@ -16,7 +16,7 @@ const Content = ({ selected, anecdotes }) => {
   return (
     <div>
       <p>{anecdotes[selected].label}</p>
-      <p>has {anecdotes[selected].points} votes</p>
+      <p>has {anecdotes[selected].points} votes.</p>
     </div>
   );
 };
