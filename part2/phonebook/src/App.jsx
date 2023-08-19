@@ -20,7 +20,11 @@ const App = () => {
     // console.log("useEffect");
     PersonsService.getAll()
       .then((initialPersons) => setPersons(initialPersons))
-      .catch((error) => alert("Persons are still empty"));
+      .catch(() =>
+        alert(
+          "Persons are still empty, please try run 'npm run server' in the terminal"
+        )
+      );
   }, []);
 
   const handleSubmit = (event) => {
@@ -28,7 +32,6 @@ const App = () => {
     const newPerson = {
       name: newName,
       number: newNumber,
-      // id: persons.length + 1,
     };
 
     if (newName === "") {
@@ -63,10 +66,11 @@ const App = () => {
             setMessage(`${newName} phone number has been updated`);
             setIsError(false);
           })
-          .catch((error) => {
+          .catch(() => {
             setMessage(
-              `Sorry, either it's failed or ${newName} has already been deleted`
+              `Sorry, either it's failed or information ${newName} has already been deleted`
             );
+            setPersons(persons.filter((person) => person.name !== newName));
             setIsError(true);
           });
       }
@@ -77,8 +81,10 @@ const App = () => {
           setMessage(`Added ${newName} to phonebook`);
           setIsError(false);
         })
-        .catch((error) => {
-          setMessage(`Sorry, ${newName} could not be added to phonebook`);
+        .catch(() => {
+          setMessage(
+            `Sorry, information ${newName} could not be added to phonebook`
+          );
           setIsError(true);
         });
     }
@@ -109,8 +115,14 @@ const App = () => {
       )
     ) {
       PersonsService.deleteById(id)
-        .then((response) => {
+        .then(() => {
           // console.log("response :>> ", response);
+          setMessage(
+            `Information of ${
+              persons.find((person) => person.id === id).name
+            } has been removed from the server`
+          );
+          setIsError(false);
         })
         .catch(() => {
           setMessage(
@@ -119,11 +131,11 @@ const App = () => {
             } has already been removed from the server`
           );
           setIsError(true);
-          setTimeout(() => setMessage(null), 5000);
         })
-        .finally(() =>
-          setPersons(persons.filter((person) => person.id !== id))
-        );
+        .finally(() => {
+          setTimeout(() => setMessage(null), 5000);
+          setPersons(persons.filter((person) => person.id !== id));
+        });
     }
   };
 
