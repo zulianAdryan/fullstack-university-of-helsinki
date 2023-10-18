@@ -3,21 +3,24 @@ import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Notification from "./components/Notification";
 import LoginForm from "./components/LoginForm";
-import BlogList from "./components/BlogList";
+import Blog from "./components/Blog";
 import BlogForm from "./components/BlogForm";
+import Togglable from "./components/Togglable";
+import { useRef } from "react";
 
 const App = () => {
   const defaultLoginForm = { username: "", password: "" };
-  const defaultBlogForm = { title: "", author: "", url: "" };
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [message, setMessage] = useState(null);
   const [isError, setIsError] = useState(false);
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
   const [loginForm, setLoginForm] = useState(defaultLoginForm);
-  const [blogForm, setBlogForm] = useState(defaultBlogForm);
+  const blogFormRef = useRef();
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    blogService.getAll().then((blogs) => {
+      setBlogs(blogs);
+    });
   }, []);
 
   useEffect(() => {
@@ -25,7 +28,6 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
       setUser(user);
-      blogService.setToken(user.token);
     }
   }, []);
 
@@ -39,14 +41,15 @@ const App = () => {
         "loggedBlogappUser",
         JSON.stringify(userLogin)
       );
-      setErrorMessage("Login success, welcome back!");
+      blogService.setToken(userLogin.token);
+      setMessage("Login success, welcome back!");
       setIsError(false);
     } catch (error) {
       console.error("error login", error);
-      setErrorMessage(error?.response?.data?.error ?? "Wrong credentials");
+      setMessage(error?.response?.data?.error ?? "Wrong credentials");
       setIsError(true);
     } finally {
-      setTimeout(() => setErrorMessage(null), 5000);
+      setTimeout(() => setMessage(null), 5000);
     }
   };
 
@@ -55,27 +58,92 @@ const App = () => {
     window.location.reload();
   };
 
-  const handleCreateBlog = async (event) => {
-    event.preventDefault();
+  const handleCreateBlog = async (blogForm) => {
     try {
       const newBlog = await blogService.create(blogForm);
+      setMessage(`a new blog ${blogForm.title} by ${blogForm.author} added`);
       setBlogs((current) => current.concat(newBlog));
-      setErrorMessage(
-        `a new blog ${blogForm.title} by ${blogForm.author} added`
-      );
       setIsError(false);
+      blogFormRef.current.toggleVisibility();
     } catch (error) {
       console.error("error create blog", error);
-      setErrorMessage(error?.response?.data?.error ?? "Failed to create blog");
+      setMessage(error?.response?.data?.error ?? "Failed to create blog");
       setIsError(true);
     } finally {
-      setTimeout(() => setErrorMessage(null), 5000);
+      setTimeout(() => setMessage(null), 5000);
+    }
+  };
+
+  const handleLikeBlog = async (blog) => {
+    try {
+      const updatedBlog = await blogService.like(blog);
+      // console.log("RESPONSE", updatedBlog);
+      const updatedBlogs = blogs.map((blogItem) =>
+        blogItem.id === blog.id ? updatedBlog : blogItem
+      );
+      setBlogs(updatedBlogs);
+      setMessage(`Success like blog ${blog.title}`);
+      setIsError(false);
+    } catch (error) {
+      console.error("error like blog", error);
+      setMessage(
+        error?.response?.data?.error ?? `Failed to like blog ${blog.title}`
+      );
+      setIsError(true);
+    } finally {
+      setTimeout(() => setMessage(null), 5000);
+    }
+  };
+
+  const handleDeleteBlog = async (blog) => {
+    try {
+      await blogService.deleteBlog(blog);
+      setBlogs((current) =>
+        current.filter((blogItem) => blogItem.id !== blog.id)
+      );
+      setMessage(`Success delete blog ${blog.title}`);
+      setIsError(false);
+    } catch (error) {
+      console.error("error delete blog", error);
+      setMessage(
+        error?.response?.data?.error ?? `Failed to delete blog ${blog.title}`
+      );
+      setIsError(true);
+    } finally {
+      setTimeout(() => setMessage(null), 5000);
+    }
+  };
+  const renderBlogForm = () => (
+    <Togglable
+      buttonShowLabel="new note"
+      buttonHideLabel="cancel"
+      ref={blogFormRef}
+    >
+      <BlogForm onSubmit={handleCreateBlog} />
+    </Togglable>
+  );
+
+  const renderBlog = (blogs) => {
+    if (blogs.length) {
+      return blogs
+        .sort((prev, current) => current.likes - prev.likes)
+        .map((blog) => (
+          <Blog
+            user={user}
+            blog={blog}
+            onLike={handleLikeBlog}
+            onDelete={handleDeleteBlog}
+            key={blog.id}
+          />
+        ));
+    } else {
+      return <p>There is no any blog yet</p>;
     }
   };
 
   return (
     <div>
-      <Notification message={errorMessage} isError={isError} />
+      <Notification message={message} isError={isError} />
       {!user ? (
         <LoginForm onChangeInput={setLoginForm} onSubmit={handleLogin} />
       ) : (
@@ -87,8 +155,8 @@ const App = () => {
               logout
             </button>
           </p>
-          <BlogForm onChangeInput={setBlogForm} onSubmit={handleCreateBlog} />
-          <BlogList blogs={blogs} />
+          {renderBlogForm()}
+          {renderBlog(blogs)}
         </div>
       )}
     </div>
