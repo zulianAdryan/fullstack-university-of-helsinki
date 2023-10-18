@@ -20,9 +20,10 @@ const App = () => {
     // console.log("useEffect");
     PersonsService.getAll()
       .then((initialPersons) => setPersons(initialPersons))
-      .catch(() =>
+      .catch((error) =>
         alert(
-          "Persons are still empty, please try run 'npm run server' in the terminal"
+          error.response.data.error ??
+            "Persons are still empty, please make sure server is running"
         )
       );
   }, []);
@@ -34,12 +35,12 @@ const App = () => {
       number: newNumber,
     };
 
-    if (newName === "") {
-      return alert(`name cannot be empty`);
-    }
-    if (newNumber === "") {
-      return alert(`number cannot be empty`);
-    }
+    // if (newName === "") {
+    //   return alert(`name cannot be empty`);
+    // }
+    // if (newNumber === "") {
+    //   return alert(`number cannot be empty`);
+    // }
 
     const isAlreadyExists = persons.some(
       (person) => person.name.toLowerCase() === newName.toLocaleLowerCase()
@@ -66,11 +67,12 @@ const App = () => {
             setMessage(`${newName} phone number has been updated`);
             setIsError(false);
           })
-          .catch(() => {
+          .catch((error) => {
             setMessage(
-              `Sorry, either it's failed or information ${newName} has already been deleted`
+              error.response.data.error ??
+                `Sorry, either it's failed or information ${newName} has already been deleted`
             );
-            setPersons(persons.filter((person) => person.name !== newName));
+            // setPersons(persons.filter((person) => person.name !== newName));
             setIsError(true);
           });
       }
@@ -81,9 +83,10 @@ const App = () => {
           setMessage(`Added ${newName} to phonebook`);
           setIsError(false);
         })
-        .catch(() => {
+        .catch((error) => {
           setMessage(
-            `Sorry, information ${newName} could not be added to phonebook`
+            error.response.data.error ??
+              `Sorry, information ${newName} could not be added to phonebook`
           );
           setIsError(true);
         });
@@ -124,11 +127,12 @@ const App = () => {
           );
           setIsError(false);
         })
-        .catch(() => {
+        .catch((error) => {
           setMessage(
-            `Information of ${
-              persons.find((person) => person.id === id).name
-            } has already been removed from the server`
+            error.response.data.error ??
+              `Information of ${
+                persons.find((person) => person.id === id).name
+              } has already been removed from the server`
           );
           setIsError(true);
         })

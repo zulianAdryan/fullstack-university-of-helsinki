@@ -1,5 +1,7 @@
 import axios from "axios";
-const baseUrl = "http://localhost:3001/persons";
+const baseUrl =
+  "https://myphonebookapp.netlify.app/.netlify/functions/server/api/persons";
+// "/api/persons";
 
 const getAll = async () => {
   const request = axios.get(baseUrl);
