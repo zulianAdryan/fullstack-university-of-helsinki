@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 const AnecdoteMostVoted = () => {
-  const anecdotes = useSelector((state) => state);
+  const anecdotes = useSelector((state) => state.anecdotes);
 
   const mostVotedAnecdote = anecdotes.reduce((max, curr) =>
     curr.points > max.points ? curr : max
