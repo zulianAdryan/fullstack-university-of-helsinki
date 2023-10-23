@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { voteAnecdoteOf } from "../redux/reducers/anecdoteReducer";
+import { voteAnecdote } from "../redux/reducers/anecdoteReducer";
 import Notification from "./Notification";
 import {
   clearNotification,
@@ -11,9 +11,9 @@ const Anecdote = ({ anecdote, voteAnecdot }) => {
   return (
     <div>
       <div>
-        <p>{anecdote.label}</p>
+        <p>{anecdote.content}</p>
         <p>
-          has {anecdote.points} votes
+          has {anecdote.votes} votes
           <button type="button" onClick={voteAnecdot}>
             vote
           </button>
@@ -26,31 +26,36 @@ const Anecdote = ({ anecdote, voteAnecdot }) => {
 const AnecdoteList = () => {
   const dispatch = useDispatch();
   const anecdotes = useSelector((state) => {
-    return state.anecdotes.filter((anecdote) =>
-      anecdote.label.toLowerCase().includes(state.filter.toLowerCase())
-    );
+    const { anecdotes } = state;
+    // console.log("anecdotes", anecdotes);
+    return anecdotes.length > 0
+      ? anecdotes.filter((anecdote) =>
+          anecdote.content.toLowerCase().includes(state.filter.toLowerCase())
+        )
+      : null;
   });
 
-  const handleVoteAnecdot = (label) => {
-    dispatch(voteAnecdoteOf(label));
-    dispatch(setNotification(label));
-    setTimeout(() => {
-      dispatch(clearNotification());
-    }, 1000);
+  const handleVoteAnecdot = (anecdote) => {
+    dispatch(voteAnecdote(anecdote));
+    dispatch(setNotification(anecdote.content, 1000));
   };
 
   return (
     <div>
       <Notification />
-      {anecdotes
-        .sort((a, b) => b.points - a.points)
-        .map((anecdote) => (
-          <Anecdote
-            key={anecdote.label}
-            anecdote={anecdote}
-            voteAnecdot={() => handleVoteAnecdot(anecdote.label)}
-          />
-        ))}
+      {!anecdotes ? (
+        <div>there is no any anecdotes yet</div>
+      ) : (
+        anecdotes
+          .sort((a, b) => b.votes - a.votes)
+          .map((anecdote) => (
+            <Anecdote
+              key={anecdote.id}
+              anecdote={anecdote}
+              voteAnecdot={() => handleVoteAnecdot(anecdote)}
+            />
+          ))
+      )}
     </div>
   );
 };
