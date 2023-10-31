@@ -18,10 +18,14 @@ export const { createNotification, clearNotification } =
 
 export const setNotification = (text, seconds = 5000) => {
   return async (dispatch) => {
+    const resetNotification = () => {
+      setTimeout(() => {
+        dispatch(clearNotification());
+      }, parseInt(seconds));
+    };
+    clearInterval(resetNotification);
     dispatch(createNotification(text));
-    setTimeout(() => {
-      dispatch(clearNotification());
-    }, parseInt(seconds));
+    resetNotification();
   };
 };
 
