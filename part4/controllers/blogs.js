@@ -16,6 +16,14 @@ blogsRouter.get("/", async (request, response) => {
   response.json(blogs);
 });
 
+blogsRouter.get("/:id", async (request, response) => {
+  const blog = await Blog.findById(request.params.id).populate("user", {
+    username: 1,
+    name: 1,
+  });
+  response.json(blog);
+});
+
 blogsRouter.post("/", userExtractor, async (request, response) => {
   const body = request.body;
 
@@ -81,30 +89,27 @@ blogsRouter.put("/:id", userExtractor, async (request, response) => {
       .status(404)
       .json({ error: "blog is either not exist or has been deleted" });
   }
-  const user = request.user;
 
-  if (blog.user.toString() === user._id.toString()) {
-    const body = request.body;
-    const blog = {
-      title: body.title,
-      url: body.url,
-      author: body.author,
-      likes: body.likes,
-    };
+  // const user = request.user;
+  // if (blog.user.toString() === user._id.toString()) {
+  const body = request.body;
+  const updateBlog = {
+    title: body.title,
+    url: body.url,
+    author: body.author,
+    likes: body.likes,
+  };
 
-    await Blog.findByIdAndUpdate(request.params.id, blog, {
-      new: true,
-    });
-    const updatedBlog = await Blog.findById(request.params.id).populate(
-      "user",
-      {
-        username: 1,
-        name: 1,
-      }
-    );
+  await Blog.findByIdAndUpdate(request.params.id, updateBlog, {
+    new: true,
+  });
+  const updatedBlog = await Blog.findById(request.params.id).populate("user", {
+    username: 1,
+    name: 1,
+  });
 
-    response.json(updatedBlog);
-  }
+  response.json(updatedBlog);
+  // }
 });
 
 module.exports = blogsRouter;
