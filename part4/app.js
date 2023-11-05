@@ -9,6 +9,7 @@ const middleware = require("./utils/middleware");
 const mongoose = require("mongoose");
 const usersRouter = require("./controllers/users");
 const loginRouter = require("./controllers/login");
+const commentsRouter = require("./controllers/comments");
 
 mongoose.set("strictQuery", false);
 
@@ -29,6 +30,7 @@ app.use(middleware.tokenExtractor);
 
 app.use("/api/blogs", blogsRouter);
 app.use("/api/users", usersRouter);
+app.use("/api/comments", commentsRouter);
 app.use("/api/login", loginRouter);
 if (process.env.NODE_ENV === "test") {
   const testingRouter = require("./controllers/testing");
