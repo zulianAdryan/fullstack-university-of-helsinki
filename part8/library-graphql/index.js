@@ -26,6 +26,10 @@ let authors = [
     name: "Sandi Metz", // birthyear not known
     id: "afa5b6f3-344d-11e9-a414-719c6709cf3e",
   },
+  {
+    name: "mock", // birthyear not known
+    id: "afa5b6z9-344d-11e9-a414-719c6709cf3e",
+  },
 ];
 
 /*
@@ -109,7 +113,8 @@ const typeDefs = `
   type Authors {
     name: String!
     born: Int
-    bookCount: Int!
+    bookCount: Int
+    id: ID!
   }
 
   type Query {
