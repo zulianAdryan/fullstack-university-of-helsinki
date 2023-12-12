@@ -3,10 +3,10 @@ import { useField } from "../hooks";
 import { ALL_PERSONS, CREATE_PERSON } from "../services/queries";
 
 const PersonForm = ({ setError }) => {
-  const { reset: resetName, ...name } = useField("text");
-  const { reset: resetPhone, ...phone } = useField("text");
-  const { reset: resetStreet, ...street } = useField("text");
-  const { reset: resetCity, ...city } = useField("text");
+  const { reset: resetName, ...name } = useField("text", "name");
+  const { reset: resetPhone, ...phone } = useField("text", "phone");
+  const { reset: resetStreet, ...street } = useField("text", "street");
+  const { reset: resetCity, ...city } = useField("text", "city");
 
   const [createPerson] = useMutation(CREATE_PERSON, {
     onError: (error) => {
