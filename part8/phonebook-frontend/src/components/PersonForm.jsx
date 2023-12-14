@@ -9,29 +9,46 @@ const PersonForm = ({ setError }) => {
   const { reset: resetCity, ...city } = useField("text", "city");
 
   const [createPerson] = useMutation(CREATE_PERSON, {
+    onCompleted: () => {
+      // console.log("success", res);
+    },
     onError: (error) => {
-      const messages = error.graphQLErrors.map((e) => e.message).join("\n");
+      // const messages = error.graphQLErrors.map((e) => e.message).join("\n");
+      const messages = error.graphQLErrors
+        .map((e) => e.extensions.error.message)
+        .join("\n");
       setError(messages);
     },
   });
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
 
-    createPerson({
+    const createNewPerson = await createPerson({
       variables: {
         name: name.value,
-        phone: phone.value,
+        phone: phone.value.length > 0 ? phone.value : undefined,
         street: street.value,
         city: city.value,
       },
-      refetchQueries: [{ query: ALL_PERSONS }],
+      // AUTOMATICALLY WAY TO REFETCH AND UPDATE THE CACHE
+      // refetchQueries: [{ query: ALL_PERSONS }],
+      // MANUAL WAY TO REFETCH QUERY AND UPDATE THE CACHE
+      update: (cache, response) => {
+        cache.updateQuery({ query: ALL_PERSONS }, ({ allPersons }) => {
+          return {
+            allPersons: allPersons.concat(response.data.addPerson),
+          };
+        });
+      },
     });
-
-    resetName();
-    resetPhone();
-    resetStreet();
-    resetCity();
+    // console.log("res", createNewPerson);
+    if (createNewPerson.data) {
+      resetName();
+      resetPhone();
+      resetStreet();
+      resetCity();
+    }
   };
 
   return (

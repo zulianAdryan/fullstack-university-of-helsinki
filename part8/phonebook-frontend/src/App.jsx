@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApolloClient, useQuery } from "@apollo/client";
 import { ALL_PERSONS } from "./services/queries";
 import Persons from "./components/Persons";
@@ -13,11 +13,22 @@ const App = () => {
   const result = useQuery(ALL_PERSONS);
   const client = useApolloClient();
 
+  useEffect(() => {
+    if (!token) {
+      const savedToken = localStorage.getItem(
+        import.meta.env.VITE_APP_STORAGE_KEY
+      );
+      if (savedToken) {
+        setToken(savedToken);
+      }
+    }
+  }, []);
+
   const notify = (message) => {
     setErrorMessage(message);
     setTimeout(() => {
       setErrorMessage(null);
-    }, 10000);
+    }, 2000);
   };
 
   const logout = () => {

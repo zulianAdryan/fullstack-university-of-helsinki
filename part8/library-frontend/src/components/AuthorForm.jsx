@@ -1,13 +1,13 @@
 import Select from "react-select";
 import { useMutation } from "@apollo/client";
-import { ALL_AUTHORS, EDIT_AUTHOR_BORN } from "../services/queries";
+import { ALL_AUTHORS, ALL_BOOKS, EDIT_AUTHOR } from "../services/queries";
 import { useField } from "../hooks";
 import { useState } from "react";
 
 const AuthorForm = ({ authors, setError }) => {
-  const [name, setName] = useState(null);
+  const [selectedAuthor, setSelectedAuthor] = useState(null);
   const { reset: resetBorn, ...born } = useField("number");
-  const [editAuthorBorn] = useMutation(EDIT_AUTHOR_BORN, {
+  const [editAuthorBorn] = useMutation(EDIT_AUTHOR, {
     onError: (error) => {
       const messages = error.graphQLErrors
         .map((error) => error.message)
@@ -16,18 +16,23 @@ const AuthorForm = ({ authors, setError }) => {
     },
   });
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
-    editAuthorBorn({
+    const response = await editAuthorBorn({
       variables: {
-        name: name.value,
-        setBornTo: parseInt(born.value),
+        name: selectedAuthor?.label,
+        born: parseInt(born.value),
+        id: selectedAuthor?.value,
       },
-      refetchQueries: [{ query: ALL_AUTHORS }],
+      refetchQueries: [{ query: ALL_AUTHORS }, { query: ALL_BOOKS }],
     });
-    setName(null);
-    resetBorn();
+    if (response.data?.editAuthor) {
+      setSelectedAuthor(null);
+      resetBorn();
+    }
   };
+
+  console.log("authors", authors);
 
   return (
     <div>
@@ -38,10 +43,10 @@ const AuthorForm = ({ authors, setError }) => {
             placeholder="Select Author"
             options={authors.map((author) => ({
               label: author.name,
-              value: author.name,
+              value: author.id,
             }))}
-            value={name}
-            onChange={(selected) => setName(selected)}
+            value={selectedAuthor}
+            onChange={(selected) => setSelectedAuthor(selected)}
           />
         </div>
         <div>

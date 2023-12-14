@@ -1,41 +1,54 @@
 import { useState } from "react";
 import { useMutation } from "@apollo/client";
-import { ALL_BOOKS, CREATE_BOOK } from "../services/queries";
+import { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK } from "../services/queries";
 import { useField } from "../hooks";
+import { useNavigate } from "react-router-dom";
 
-const NewBook = ({ setError }) => {
+const NewBook = ({ setError, favoriteGenre }) => {
   const { reset: resetTitle, ...title } = useField("text");
   const { reset: resetAuthor, ...author } = useField("text");
   const { reset: resetPublished, ...published } = useField("number");
   const { reset: resetGenre, ...genre } = useField("text");
   const [genres, setGenres] = useState([]);
+  const navigate = useNavigate();
 
   const [createBook] = useMutation(CREATE_BOOK, {
     onError: (error) => {
-      const messages = error.graphQLErrors.map((e) => e.message).join("\n");
-      setError(messages);
+      // console.log("error: ", error);
+      const messages = error.graphQLErrors.map((e) => e?.message).join("\n");
+      const extensionMessages = error.graphQLErrors
+        .map((e) => e?.extensions?.error?.message)
+        .join("\n");
+      setError([messages, extensionMessages].flat().join(", "));
     },
   });
 
   const onSubmit = async (event) => {
     event.preventDefault();
     console.log("add book...");
-
-    createBook({
+    const response = await createBook({
       variables: {
         title: title.value,
         author: author.value,
         published: parseInt(published.value),
         genres,
       },
-      refetchQueries: [{ query: ALL_BOOKS }],
+      refetchQueries: [
+        { query: ALL_BOOKS },
+        { query: ALL_BOOKS, variables: { genre: favoriteGenre } },
+        { query: ALL_AUTHORS },
+      ],
     });
 
-    resetTitle();
-    resetPublished();
-    resetAuthor();
-    resetGenre();
-    setGenres([]);
+    console.log("create new book", response);
+    if (response?.data?.addBook) {
+      resetTitle();
+      resetPublished();
+      resetAuthor();
+      resetGenre();
+      setGenres([]);
+      navigate("/books");
+    }
   };
 
   const addGenre = () => {

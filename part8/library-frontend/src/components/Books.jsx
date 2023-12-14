@@ -1,33 +1,50 @@
 import { useQuery } from "@apollo/client";
 import { ALL_BOOKS } from "../services/queries";
+import { useState } from "react";
+import TableOfBooks from "./TableOfBooks";
 
 const Books = () => {
+  const [filterGenre, setFilterGenre] = useState("all genres");
   const books = useQuery(ALL_BOOKS);
-
+  const genres = [
+    "refactoring",
+    "agile",
+    "patterns",
+    "design",
+    "crime",
+    "classic",
+    "all genres",
+  ];
   if (books.loading) {
     return null;
   }
 
+  // console.log("books", books.data?.allBooks);
+
   return (
     <div>
       <h2>books</h2>
-
-      <table>
-        <tbody>
-          <tr>
-            <th></th>
-            <th>author</th>
-            <th>published</th>
-          </tr>
-          {books.data.allBooks.map((book, index) => (
-            <tr key={`${index}_${book.title}`}>
-              <td>{book.title}</td>
-              <td>{book.author}</td>
-              <td>{book.published}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <p>
+        in genre <b>{filterGenre}</b>
+      </p>
+      <div>
+        {genres.map((genre) => (
+          <button
+            key={genre}
+            type="button"
+            onClick={() => setFilterGenre(genre)}
+          >
+            {genre}
+          </button>
+        ))}
+      </div>
+      <TableOfBooks
+        books={books.data.allBooks.filter((book) =>
+          filterGenre !== "all genres"
+            ? book.genres.includes(filterGenre)
+            : book
+        )}
+      />
     </div>
   );
 };
