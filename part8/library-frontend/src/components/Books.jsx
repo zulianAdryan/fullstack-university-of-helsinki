@@ -39,9 +39,9 @@ const Books = () => {
         ))}
       </div>
       <TableOfBooks
-        books={books.data.allBooks.filter((book) =>
+        books={books?.data?.allBooks?.filter((book) =>
           filterGenre !== "all genres"
-            ? book.genres.includes(filterGenre)
+            ? book?.genres?.includes(filterGenre)
             : book
         )}
       />

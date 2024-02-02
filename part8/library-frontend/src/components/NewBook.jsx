@@ -3,6 +3,7 @@ import { useMutation } from "@apollo/client";
 import { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK } from "../services/queries";
 import { useField } from "../hooks";
 import { useNavigate } from "react-router-dom";
+import { updateCache } from "../App";
 
 const NewBook = ({ setError, favoriteGenre }) => {
   const { reset: resetTitle, ...title } = useField("text");
@@ -33,9 +34,11 @@ const NewBook = ({ setError, favoriteGenre }) => {
         published: parseInt(published.value),
         genres,
       },
+      update: (cache, response) => {
+        updateCache(cache, ALL_BOOKS, response?.data?.addBook);
+      },
       refetchQueries: [
-        { query: ALL_BOOKS },
-        { query: ALL_BOOKS, variables: { genre: favoriteGenre } },
+        { query: ALL_BOOKS, variables: { favoriteGenre } },
         { query: ALL_AUTHORS },
       ],
     });

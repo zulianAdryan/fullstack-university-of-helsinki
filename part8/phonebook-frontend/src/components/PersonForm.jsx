@@ -1,6 +1,7 @@
 import { useMutation } from "@apollo/client";
 import { useField } from "../hooks";
 import { ALL_PERSONS, CREATE_PERSON } from "../services/queries";
+import { updateCache } from "../App";
 
 const PersonForm = ({ setError }) => {
   const { reset: resetName, ...name } = useField("text", "name");
@@ -35,14 +36,10 @@ const PersonForm = ({ setError }) => {
       // refetchQueries: [{ query: ALL_PERSONS }],
       // MANUAL WAY TO REFETCH QUERY AND UPDATE THE CACHE
       update: (cache, response) => {
-        cache.updateQuery({ query: ALL_PERSONS }, ({ allPersons }) => {
-          return {
-            allPersons: allPersons.concat(response.data.addPerson),
-          };
-        });
+        updateCache(cache, ALL_PERSONS, response?.data?.addPerson);
       },
     });
-    // console.log("res", createNewPerson);
+    console.log("createNewPerson", createNewPerson);
     if (createNewPerson.data) {
       resetName();
       resetPhone();
