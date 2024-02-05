@@ -41,9 +41,9 @@ const AuthorForm = ({ authors, setError }) => {
         <div>
           <Select
             placeholder="Select Author"
-            options={authors.map((author) => ({
-              label: author.name,
-              value: author.id,
+            options={authors?.map((author) => ({
+              label: author?.name,
+              value: author?.id,
             }))}
             value={selectedAuthor}
             onChange={(selected) => setSelectedAuthor(selected)}

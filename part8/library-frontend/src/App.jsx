@@ -45,7 +45,7 @@ const App = () => {
       const addedBook = data?.data?.bookAdded;
       notify(`${addedBook?.title} added`);
       updateCache(client.cache, ALL_BOOKS, addedBook);
-      console.log("subscribe", data);
+      // console.log("subscribe", data);
     },
   });
 

@@ -14,7 +14,7 @@ const Authors = ({ setError }) => {
     <div>
       <h2>authors</h2>
       <TableOfAuthors authors={authors?.data?.allAuthors} />
-      <AuthorForm authors={authors.data.allAuthors} setError={setError} />
+      <AuthorForm authors={authors?.data?.allAuthors} setError={setError} />
     </div>
   );
 };
