@@ -1,0 +1,13 @@
+docker run -it ubuntu bash
+mkdir /usr/src/app
+touch /usr/src/app/index.js
+exit
+docker container ls -a
+docker start 1c5081bcad3d
+docker container ls
+docker kill 1c5081bcad3d
+docker container ls -a
+docker start -i 1c5081bcad3d
+root@1c5081bcad3d:/# apt-get update
+root@1c5081bcad3d:/# apt-get -y install nano
+root@1c5081bcad3d:/# nano /usr/src/app/index.js

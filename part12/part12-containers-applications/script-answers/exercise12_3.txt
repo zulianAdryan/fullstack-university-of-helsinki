@@ -1,0 +1,15 @@
+root@1c5081bcad3d:/# apt-get install nodejs
+root@1c5081bcad3d:/# node usr/src/app/index.js
+exit
+docker commit 1c5081bcad3d hello-node-world
+docker image ls
+docker run -it hello-node-world bash
+root@fa417cd4783b:/# exit
+docker container ls -a
+docker container rm 2498675703f3
+docker container rm 1c5081bcad3d
+docker container ls -a
+docker container run -it --name hello-node node:16 bash
+root@27663cd607d8:/# mkdir usr/src/app
+~ docker container cp ./index.js hello-node:/usr/src/app/index.js
+root@27663cd607d8:/# node /usr/src/app/index.js

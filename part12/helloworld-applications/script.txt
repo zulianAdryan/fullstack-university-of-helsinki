@@ -1,0 +1,9 @@
+docker build -t fs-hello-world .
+docker run fs-hello-world
+npx express-generator
+DEBUG=helloworld-applications:* npm start
+docker build -t express-server .
+docker run -p 3123:3000 express-server
+
+// AFTER CHANGE THE Dockerfile
+docker build -t express-server . && docker run -p 3123:3000 express-server
