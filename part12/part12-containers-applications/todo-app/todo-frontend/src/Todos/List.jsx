@@ -1,3 +1,5 @@
+import Todo from "./Todo";
+
 const TodoList = ({ todos, deleteTodo, completeTodo }) => {
   const onClickDelete = (todo) => () => {
     deleteTodo(todo);
@@ -7,48 +9,40 @@ const TodoList = ({ todos, deleteTodo, completeTodo }) => {
     completeTodo(todo);
   };
 
-  console.log("todos", todos);
+  // console.log("todos", todos);
 
   return (
-    <>
-      {todos
-        ?.map((todo, index) => {
-          const doneInfo = (
-            <>
-              <span>This todo is done</span>
-              <span>
-                <button onClick={onClickDelete(todo)}> Delete </button>
-              </span>
-            </>
-          );
-
-          const notDoneInfo = (
-            <>
-              <span>This todo is not done</span>
-              <span>
-                <button onClick={onClickDelete(todo)}> Delete </button>
-                <button onClick={onClickComplete(todo)}> Set as done </button>
-              </span>
-            </>
-          );
-
-          return (
-            <div
-              key={index}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                maxWidth: "70%",
-                margin: "auto",
-              }}
-            >
-              <span>{todo.text}</span>
-              {todo.done ? doneInfo : notDoneInfo}
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+      }}
+    >
+      {todos?.map((todo, index) => (
+        <div
+          key={index}
+          style={{
+            width: "100%",
+            margin: "5px 0px",
+          }}
+        >
+          {index === 0 ? (
+            <div style={{ paddingBottom: "10px" }}>
+              <hr />
             </div>
-          );
-        })
-        .reduce((acc, cur, index) => [...acc, <hr key={index} />, cur], [])}
-    </>
+          ) : null}
+          <Todo
+            todo={todo}
+            onClickComplete={onClickComplete}
+            onClickDelete={onClickDelete}
+          />
+          <div style={{ paddingTop: "10px" }}>
+            <hr />
+          </div>
+        </div>
+      ))}
+    </div>
   );
 };
 
