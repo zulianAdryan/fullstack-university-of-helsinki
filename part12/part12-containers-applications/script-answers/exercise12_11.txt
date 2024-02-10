@@ -1,0 +1,5 @@
+docker exec -it 7e bash
+root@7e1a441ca903:/data# redis-cli
+127.0.0.1:6379> keys *
+127.0.0.1:6379> keys counter_todo
+127.0.0.1:6379> set counter_todo 9001

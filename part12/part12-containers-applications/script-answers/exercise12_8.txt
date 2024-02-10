@@ -1,0 +1,9 @@
+winpty docker exec -it d5 bash
+root@d513dbf9dacf:/# mongosh -u root -p example
+test> show dbs
+test> use the_database
+the_database> show collections
+the_database> db.todos.find({})
+the_database> db.todos.insertOne({text:'Increase the number of tools in my toolbelt', done: false})
+the_database> db.todos.find({})
+
